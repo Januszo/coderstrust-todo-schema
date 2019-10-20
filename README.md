@@ -1,2 +1,2 @@
-# todo-coderstrust-project
+# coderstrust-todo-schema
 Todo challenge
