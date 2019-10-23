@@ -1,7 +1,8 @@
 // Tutaj dodacie zmienne globalne do przechowywania elementów takich jak np. lista czy input do wpisywania nowego todo
 let $list;
-let $addButton;
-let $input;
+let addButton;
+let input;
+let form;
 const initialList = ["Kup mleko", "Wyczyść dywan"];
 
 function main() {
@@ -12,15 +13,16 @@ function main() {
 
 function prepareDOMElements() {
   // To będzie idealne miejsce do pobrania naszych elementów z drzewa DOM i zapisanie ich w zmiennych
-  $list = document.getElementById("list");
-  $addButton = document.getElementById("addTodo");
-  $input = document.getElementById("newTodo");
+  $list = document.querySelector("#list");
+  addButton = document.querySelector("#addTodo");
+  input = document.querySelector("#newTodo");
+  form = document.querySelector("#formTodo");
 }
 
 function prepareDOMEvents() {
   // Przygotowanie listenerów
   $list.addEventListener("click", listClickManager);
-  $addButton.addEventListener("click", addNewElementToList);
+  form.addEventListener("submit", addNewTodoViaForm);
 }
 
 function prepareInitialList() {
@@ -30,11 +32,23 @@ function prepareInitialList() {
   });
 }
 
+function addNewTodoViaForm(e) {
+  e.preventDefault();
+  addNewTodo();
+}
+
+function addNewTodo() {
+  if (input.value.trim() !== "") {
+    addNewElementToList(input.value);
+    input.value = "";
+  }
+}
+
 function addNewElementToList(title   /* Title, author, id */) {
   //obsługa dodawanie elementów do listy
   // $list.appendChild(createElement('nowy', 2))
-  // if ($input.value !== "") { title = $input.value };
-  if (event.target.id === "addTodo") { title = $input.value }
+  // title.preventDefault();
+  // if (event.target.id === "form") { title = input.value }
   const newElement = createElement(title);
   $list.appendChild(newElement);
 }
@@ -42,9 +56,18 @@ function addNewElementToList(title   /* Title, author, id */) {
 function createElement(title /* Title, author, id */) {
   // Tworzyc reprezentacje DOM elementu return newElement
   // return newElement
-  if (title === "") {title = "PUSTY_ELEMENT"};
+  // if (title === "") {title = "PUSTY_ELEMENT"};
+
+  // template literals zrobić może ${}
+
   const newElement = document.createElement("li");
-  newElement.innerText = title;
+  const newSpan = document.createElement("span")
+  newSpan.innerText = title;
+
+  const delButton = document.createElement("button");
+  delButton.innerText = "Delete";
+  newElement.appendChild(newSpan);
+  newElement.appendChild(delButton);
 
   return newElement;
 }
