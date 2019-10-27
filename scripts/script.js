@@ -32,6 +32,10 @@ Wygląd aplikacji nie jest ustalony i kursant może się pochwalić tutaj wiedz�
 let $list;
 let input;
 let form;
+let modal;
+let cancel;
+let close;
+let ok;
 
 function main() {
   prepareDOMElements();
@@ -44,12 +48,17 @@ function prepareDOMElements() {
   $list = document.querySelector("#list");
   input = document.querySelector("#newTodo");
   form = document.querySelector("#formTodo");
+  modal = document.querySelector("#myModal");
+  cancel = document.querySelector("#cancelModal");
+  close = document.querySelector("#closeModal");
+  ok = document.querySelector("#acceptModal");
 }
 
 function prepareDOMEvents() {
   // Przygotowanie listenerów
   $list.addEventListener("click", listClickManager);
   form.addEventListener("submit", addNewTodoViaForm);
+  close.addEventListener("click", closeModal);
 }
 
 function getTodosFromServer() {
@@ -57,6 +66,7 @@ function getTodosFromServer() {
     .then(function (response) {
       response.data.forEach(function (todo) {
         addNewElementToList(todo.title, todo.id);
+        if (todo.extra === "done") {document.getElementById(todo.id).firstChild.className = "done"}
       });
     });
 }
@@ -68,9 +78,14 @@ function addNewTodoViaForm(e) {
 
 function addNewTodo() {
   if (input.value.trim() !== "") {
-    addNewElementToList(input.value);
     postTodoToServer();
-    input.value = "";
+    setTimeout(() => {
+    axios.get("http://195.181.210.249:3000/todo/")
+      .then(function (response) {
+        let justAddedId = response.data.slice(-1);
+        addNewElementToList(input.value, justAddedId[0].id);
+        input.value = "";
+      })}, 100);
   };
 }
 
@@ -105,8 +120,8 @@ function listClickManager(event) {
   const clickedClass = event.target.className;
   if (clickedClass === "delBtns") {
     deleteTodo(clickedId);
-  } else if (clickedClass === "editBtn") {
-    editTodo(clickedId);
+  } else if (clickedClass === "editBtns") {
+    openModal(clickedId);
   } else if (clickedClass === "markAsDone") {
     markAsDone(clickedId);
   };
@@ -120,28 +135,44 @@ function deleteTodo(id) {
 }
 
 function markAsDone(id) {
-  // zrobić lepszy toggler przekreślania
-  // const element = document.getElementById(id).firstChild;
-  // console.log(element)
-  // if (element.style.textDecoration === "line-through") {
-  //   element.style.textDecoration = "none";
-  //   console.log(element);
-  // } else if (element.style.textDecoration === "none") {
-  //   element.style.textDecoration = "line-through";
-  // };
-  axios.put("http://195.181.210.249:3000/todo/" + id, {
-    extra: "done",
-  });
+  const element = document.getElementById(id).firstChild;
+  if (element.className === "") {
+    element.classList.add("done");
+    axios.put("http://195.181.210.249:3000/todo/" + id, {
+      extra: "done",
+    });
+  } else if (element.className === "done") {
+    element.classList.remove("done");
+    axios.put("http://195.181.210.249:3000/todo/" + id, {
+      extra: null,
+    });
+  };
 }
 
-function openPopup() {
-  // Otwórz popup
+function openModal(id) {
+  let spanValue = document.getElementById(id).firstChild;
+  let modalInput = document.getElementById("popupInput");
+  modalInput.value = spanValue.innerHTML;
+  modal.style.display = "block";
+  modalInput.focus();
+  
+  let cancelModal = () => document.getElementById("popupInput").value = spanValue.innerHTML;
+  cancel.addEventListener("click", cancelModal);
+
+  let okModal = () => {
+    spanValue.innerHTML = modalInput.value;
+    axios.put("http://195.181.210.249:3000/todo/" + id, {
+      title: modalInput.value
+    }).then(() => { modal.style.display = "none" });
+  };
+  ok.addEventListener("click", okModal);
 }
 
-function closePopup() {
-  // Zamknij popup
+function closeModal() {
+  modal.style.display = "none";
 }
 
+// document.querySelector(".modal").style.display = "none";
 
 
 document.addEventListener("DOMContentLoaded", main);
