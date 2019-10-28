@@ -36,6 +36,7 @@ let modal;
 let cancel;
 let close;
 let ok;
+let currentId;
 
 function main() {
   prepareDOMElements();
@@ -59,6 +60,8 @@ function prepareDOMEvents() {
   $list.addEventListener("click", listClickManager);
   form.addEventListener("submit", addNewTodoViaForm);
   close.addEventListener("click", closeModal);
+  cancel.addEventListener("click", cancelModal);
+  ok.addEventListener("click", okModal);
 }
 
 function getTodosFromServer() {
@@ -66,7 +69,7 @@ function getTodosFromServer() {
     .then(function (response) {
       response.data.forEach(function (todo) {
         addNewElementToList(todo.title, todo.id);
-        if (todo.extra === "done") {document.getElementById(todo.id).firstChild.className = "done"}
+        if (todo.extra === "done") {document.getElementById(todo.id).firstChild.className = "done"};
       });
     });
 }
@@ -79,19 +82,15 @@ function addNewTodoViaForm(e) {
 function addNewTodo() {
   if (input.value.trim() !== "") {
     postTodoToServer();
-    setTimeout(() => {
-    axios.get("http://195.181.210.249:3000/todo/")
-      .then(function (response) {
-        let justAddedId = response.data.slice(-1);
-        addNewElementToList(input.value, justAddedId[0].id);
-        input.value = "";
-      })}, 100);
   };
 }
 
 function postTodoToServer() {
   axios.post("http://195.181.210.249:3000/todo/", {
     title: input.value,
+  }).then(() => {
+    $list.innerHTML = "";
+    getTodosFromServer();
   });
 }
 
@@ -116,63 +115,64 @@ function createElement(title, id) {
 
 function listClickManager(event) {
   // Rozstrzygnięcie co dokładnie zostało kliknięte i wywołanie odpowiedniej funkcji
-  const clickedId = event.target.parentElement.id;
+  currentId = event.target.parentElement.id;
   const clickedClass = event.target.className;
   if (clickedClass === "delBtns") {
-    deleteTodo(clickedId);
+    deleteTodo();
   } else if (clickedClass === "editBtns") {
-    openModal(clickedId);
+    openModal();
   } else if (clickedClass === "markAsDone") {
-    markAsDone(clickedId);
+    markAsDone();
   };
 }
 
-function deleteTodo(id) {
-  axios.delete("http://195.181.210.249:3000/todo/" + id)
+function deleteTodo() {
+  axios.delete("http://195.181.210.249:3000/todo/" + currentId)
     .then(function (response) {
-    document.getElementById(id).remove();
+    document.getElementById(currentId).remove();
   });
 }
 
-function markAsDone(id) {
-  const element = document.getElementById(id).firstChild;
+function markAsDone() {
+  const element = document.getElementById(currentId).firstChild;
   if (element.className === "") {
     element.classList.add("done");
-    axios.put("http://195.181.210.249:3000/todo/" + id, {
+    axios.put("http://195.181.210.249:3000/todo/" + currentId, {
       extra: "done",
     });
   } else if (element.className === "done") {
     element.classList.remove("done");
-    axios.put("http://195.181.210.249:3000/todo/" + id, {
+    axios.put("http://195.181.210.249:3000/todo/" + currentId, {
       extra: null,
     });
   };
 }
 
-function openModal(id) {
-  let spanValue = document.getElementById(id).firstChild;
+function openModal() {
+  let spanValue = document.getElementById(currentId).firstChild;
   let modalInput = document.getElementById("popupInput");
+  console.log(modalInput.value)
   modalInput.value = spanValue.innerHTML;
   modal.style.display = "block";
   modalInput.focus();
-  
-  let cancelModal = () => document.getElementById("popupInput").value = spanValue.innerHTML;
-  cancel.addEventListener("click", cancelModal);
-
-  let okModal = () => {
-    spanValue.innerHTML = modalInput.value;
-    axios.put("http://195.181.210.249:3000/todo/" + id, {
-      title: modalInput.value
-    }).then(() => { modal.style.display = "none" });
-  };
-  ok.addEventListener("click", okModal);
 }
 
 function closeModal() {
   modal.style.display = "none";
+  document.getElementById("popupInput").value = "";
 }
 
-// document.querySelector(".modal").style.display = "none";
+function cancelModal() {
+  document.getElementById("popupInput").value = document.getElementById(currentId).firstChild.innerHTML;
+}
 
+function okModal() {
+  let spanValue = document.getElementById(currentId).firstChild;
+  let modalInput = document.getElementById("popupInput");
+  spanValue.innerHTML = modalInput.value;
+  axios.put("http://195.181.210.249:3000/todo/" + currentId, {
+    title: modalInput.value
+  }).then(() => { modal.style.display = "none" });
+}
 
 document.addEventListener("DOMContentLoaded", main);
