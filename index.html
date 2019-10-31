@@ -4,18 +4,21 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="styles/css/style.css">
-    <title>Todo list</title>
+    <title>To-do list</title>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Liu+Jian+Mao+Cao|Roboto&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
   </head>
   <body>
 
     <form id="formTodo" class="header">
-      <h2>My ToDo List</h2>
+      <h1>My to-do list</h2>
       <input type="text" id="newTodo" placeholder="Title...">
-      <button id="addTodo">Add</button>
+      <button id="addTodo" class="addTodo">Add</button>
     </form>
       
-    <ul id="list">
+    <ul id="list" class="list">
     </ul>
 
     <div id="myModal" class="modal">

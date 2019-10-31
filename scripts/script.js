@@ -119,14 +119,19 @@ function createElement(title, id) {
   // Tworzy element do dodania
   
   const newElementWhole = 
-  `
-  <li id="${id}">
-    <span>${title}</span>
-    <button class="delBtns">Delete</button>
-    <button class="editBtns">Edit</button>
-    <button class="markAsDone">Done</button>
-  </li>
-  `
+  `<li id="${id}"><span>${title}</span>
+      <span class="buttons">
+        <button class="delBtns">
+          <i class="material-icons">delete_outline</i>
+        </button>
+        <button class="editBtns">
+          <i class="material-icons">text_format</i>
+        </button>
+        <button class="markAsDone">
+          <i class="material-icons">done</i>
+        </button>
+      </span>
+  </li>`
   //usuwa w powyższym entery i spacje, żeby nie było pustych node'ów
   let newnew = newElementWhole.replace(/\n\s+/g, "");
   return newnew;
@@ -134,8 +139,8 @@ function createElement(title, id) {
 
 function listClickManager(event) {
   // Rozstrzyga co dokładnie zostało kliknięte i wywołuje odpowiednią funkcję
-  currentId = event.target.parentElement.id;
-  const clickedClass = event.target.className;
+  currentId = event.target.parentElement.parentElement.parentElement.id;
+  const clickedClass = event.target.parentNode.className;
   if (clickedClass === "delBtns") {
     deleteTodo();
   } else if (clickedClass === "editBtns") {

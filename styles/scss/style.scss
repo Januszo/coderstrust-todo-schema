@@ -31,19 +31,44 @@ button {
 }
 
 .list {
+  width: 85%;
+  margin: 0 auto;
   font-size: 18px;
   padding-top: 15px;
   padding-left: 5px; 
   list-style-type: disc;
   li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 15px;
+    border: 1px solid gold;
+    margin-bottom: 5px;
     .buttons {
-      visibility: hidden;
+      opacity: 0;
+      button {
+        padding: 5px;
+        border-radius: 10%;
+      }
+      button:nth-child(2) {
+        margin: 0 5px;
+      }
     }
   }
 }
 
 li:hover > .buttons{
-  visibility: visible;
+  opacity: 1;
+  animation: 1s fadeIn;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 // font-family: 'Roboto', sans-serif;
