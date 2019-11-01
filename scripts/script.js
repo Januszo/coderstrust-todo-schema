@@ -35,6 +35,7 @@ PUT http://195.181.210.249:3000/todo/id - aktualizuje TODO o podanym w URLu id. 
 
   // Zmienne globalne
 let $list;
+let loader;
 let input;
 let form;
 let modal;
@@ -42,26 +43,29 @@ let cancel;
 let close;
 let ok;
 let currentId;
+let modalInput;
 
-function main() {
+let main = () => {
   // Główna funkcja inicjalizująca najważniejsze elementy i wywołująca pobranie listy
   prepareDOMElements();
   prepareDOMEvents();
   getTodosFromServer();
 }
 
-function prepareDOMElements() {
+let prepareDOMElements = () => {
   // Pobranie elementów z drzewa DOM i zapisanie ich w zmiennych
   $list = document.querySelector("#list");
+  loader = document.querySelector("#loaderBox");
   input = document.querySelector("#newTodo");
   form = document.querySelector("#formTodo");
   modal = document.querySelector("#myModal");
   cancel = document.querySelector("#cancelModal");
   close = document.querySelector("#closeModal");
   ok = document.querySelector("#acceptModal");
+  modalInput = document.querySelector("#popupInput");
 }
 
-function prepareDOMEvents() {
+let prepareDOMEvents = () => {
   // Przygotowanie listenerów
   $list.addEventListener("click", listClickManager);
   form.addEventListener("submit", addNewTodoViaForm);
@@ -70,54 +74,54 @@ function prepareDOMEvents() {
   ok.addEventListener("click", okModal);
 }
 
-function getTodosFromServer() {
+let getTodosFromServer = () => {
   // Pobiera listę z serwera
+  showLoader();
   axios.get("http://195.181.210.249:3000/todo/")
-    .then(function (response) {
-      response.data.forEach(function (todo) {
-        addNewElementToList(todo.title, todo.id);
-        if (todo.extra === "done") {document.getElementById(todo.id).firstChild.className = "done"}; // Przekreślenie jeśli element był oznaczone jako "done"
-      });
+  .then(response => {
+    response.data.forEach(todo => {
+      addNewElementToList(todo.title, todo.id);
+      if (todo.extra === "done") {document.getElementById(todo.id).firstChild.className = "done"}; // Przekreślenie jeśli element był oznaczone jako "done"
     });
+  })
+  .catch(e => console.log(`Error ${e}`))
+  .finally(() => {hideLoader()});
 }
 
+let showLoader = () => loader.classList.add("loader-box--show");
 
-function addNewTodoViaForm(e) {
+let hideLoader = () => loader.classList.remove("loader-box--show");
+
+let addNewTodoViaForm = e => {
   // Usuwa defaultowe przeładowywanie strony po submicie
   e.preventDefault();
   addNewTodo();
 }
 
-function addNewTodo() {
+let addNewTodo = () => {
   // Sprawdza czy input jest nie pusty
   if (input.value.trim() !== "") {
     postTodoToServer();
   };
 }
 
-function postTodoToServer() {
-  // Wrzuca na serwer nowy element, zwraca go, żeby dopisać id i dodaje do listy
-  axios.post("http://195.181.210.249:3000/todo/", {
-    title: input.value,
-  }).then(() => {
-    axios.get("http://195.181.210.249:3000/todo/")
-    .then(function (response) {
-      let lastElement = response.data.slice(-1)[0];
-      addNewElementToList(lastElement.title, lastElement.id);
-      input.value = "";
-    });
+let postTodoToServer = () => {
+  axios.post("http://195.181.210.249:3000/todo/", {title: input.value,})
+  .then(() => {
+    $list.innerHTML = '';
+    getTodosFromServer();
+    input.value = "";
   });
 }
 
-function addNewElementToList(title, id) {
+let addNewElementToList = (title, id) => {
   // Dodaje element do listy
   const newElement = createElement(title, id);
   $list.insertAdjacentHTML("beforeend", newElement);
 }
 
-function createElement(title, id) {
+let createElement = (title, id) => {
   // Tworzy element do dodania
-  
   const newElementWhole = 
   `<li id="${id}"><span>${title}</span>
       <span class="buttons">
@@ -137,71 +141,66 @@ function createElement(title, id) {
   return newnew;
 }
 
-function listClickManager(event) {
+let listClickManager = event => {
   // Rozstrzyga co dokładnie zostało kliknięte i wywołuje odpowiednią funkcję
-  currentId = event.target.parentElement.parentElement.parentElement.id;
+  currentId = event.target.closest("li").id;
   const clickedClass = event.target.parentNode.className;
-  if (clickedClass === "delBtns") {
-    deleteTodo();
-  } else if (clickedClass === "editBtns") {
-    openModal();
-  } else if (clickedClass === "markAsDone") {
-    markAsDone();
-  };
+  if (clickedClass === "delBtns") {deleteTodo()} 
+  else if (clickedClass === "editBtns") {openModal()} 
+  else if (clickedClass === "markAsDone") {markAsDone()};
 }
 
-function deleteTodo() {
+let deleteTodo = () => {
   // Usuwa element z listy
+  showLoader();
   axios.delete("http://195.181.210.249:3000/todo/" + currentId)
-    .then(function (response) {
-    document.getElementById(currentId).remove();
-  });
+  .then(response => document.getElementById(currentId).remove())
+  .finally(() => {hideLoader()});
 }
 
-function markAsDone() {
+let markAsDone = () => {
   // Oznacza jako zrobiony albo usuwa oznaczenie jeśli było i przesyła info do serwera
   const element = document.getElementById(currentId).firstChild;
   if (element.className === "") {
     element.classList.add("done");
-    axios.put("http://195.181.210.249:3000/todo/" + currentId, {
-      extra: "done",
-    });
+    showLoader();
+    axios.put("http://195.181.210.249:3000/todo/" + currentId, {extra: "done"})
+    .finally(() => {hideLoader()});
   } else if (element.className === "done") {
     element.classList.remove("done");
-    axios.put("http://195.181.210.249:3000/todo/" + currentId, {
-      extra: null,
-    });
+    showLoader();
+    axios.put("http://195.181.210.249:3000/todo/" + currentId, {extra: null})
+    .finally(() => {hideLoader()});
   };
 }
 
-function openModal() {
+let openModal = () => {
   // Otwiera modal z danymi z edytowanego elementu w inpucie
   let spanValue = document.getElementById(currentId).firstChild;
-  let modalInput = document.getElementById("popupInput");
   modalInput.value = spanValue.innerHTML;
   modal.style.display = "block";
   modalInput.focus();
 }
 
-function closeModal() {
+let closeModal = () => {
   // Zamyka modal i czyści go
   modal.style.display = "none";
   document.getElementById("popupInput").value = "";
 }
 
-function cancelModal() {
+let cancelModal = () => {
   // Przywraca pierwotną wartość do inputa
   document.getElementById("popupInput").value = document.getElementById(currentId).firstChild.innerHTML;
 }
 
-function okModal() {
+let okModal = () => {
   // Aktualizuje element, wysyła na serwer i zamyka modal
   let spanValue = document.getElementById(currentId).firstChild;
-  let modalInput = document.getElementById("popupInput");
   spanValue.innerHTML = modalInput.value;
-  axios.put("http://195.181.210.249:3000/todo/" + currentId, {
-    title: modalInput.value
-  }).then(() => { modal.style.display = "none" });
+  showLoader();
+  axios.put("http://195.181.210.249:3000/todo/" + currentId, {title: modalInput.value})
+  .then(() => { modal.style.display = "none" })
+  .finally(() => {hideLoader()});
 }
 
   // Inicjalizacja głównej funkcji
