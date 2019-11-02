@@ -1,58 +1,92 @@
 @import "reset";
 @import "loader";
 
-.done {
-  text-decoration: line-through;
-}
 
 body {
   font-family: 'Roboto', sans-serif;
+  background-color: rgba(0,0,0,.05);
 }
 
-button {
-  font-family: 'Roboto', sans-serif;
+.done {
+  text-decoration: line-through;
+  background-color: rgba(0,0,0,.2); 
+  animation-name: color;
+  animation-duration: 5s;
+  animation-iteration-count: infinite;
+}
+
+@keyframes color {
+  0% {
+    background-color: rgba(0,0,0,.2);
+  }
+  50% {
+    background-color: rgba(0,0,0,.1);
+  }
+  100% {
+    background-color: rgba(0,0,0,.2);
+  }
+}
+
+.newTodo {
   font-size: 18px;
+  padding: 5px;
+  border-radius: 10px;
+}
+
+.addTodo {
   border: 1px solid black;
   margin: 2px;
-  padding: 2px;
+  padding: 5px;
   cursor: pointer;
-}
-
-.addTodo:hover {
-  color: red;
+  font-size: 18px;
+  border-radius: 10px;
+  background-color: gold;
 }
 
 .header {
   text-align: center;
   h1 {
-    padding: 15px 0;
-    font-size: 28px;
+    margin: 15px 0;
+    font-size: 54px;
     font-family: 'Liu Jian Mao Cao', cursive;
+  }
+  .newTodo {
+    margin: 10px 0;
+    border: none;
+    border: 1px solid black;
   }
 }
 
 .list {
   width: 85%;
+  max-width: 600px;
   margin: 0 auto;
   font-size: 18px;
   padding-top: 15px;
-  padding-left: 5px; 
-  list-style-type: disc;
   li {
+    height: 50px;
+    padding-left: 25px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-left: 15px;
     border: 1px solid gold;
+    border-radius: 10px;
     margin-bottom: 5px;
     .buttons {
       opacity: 0;
+      margin: 2px;
+      padding: 2px;
       button {
+        width: 40px;
+        height: 40px;
+        border: 1px solid black;
+        border-radius: 10px;
         padding: 5px;
-        border-radius: 10%;
+        background-color: gold;
+        cursor: pointer;
       }
       button:nth-child(2) {
-        margin: 0 5px;
+        margin: 0 10px;
       }
     }
   }
@@ -89,15 +123,48 @@ li:hover > .buttons{
   background-color: rgb(0,0,0); /* Fallback color */
   background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
   .modal-content { /* Modal Content */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     width: 80%;
+    height: 70px;
     margin: auto;
     border: 1px solid #888;
     padding: 20px;
     background-color: #fefefe;
+    div {
+      display: flex;
+      justify-content: flex-start;
+      .popupInput {
+        border: 1px solid black;
+        margin: 2px;
+        padding: 5px;
+        font-size: 18px;
+        border-radius: 10px;
+      }
+      .cancelModal {
+        border: 1px solid black;
+        margin: 2px;
+        padding: 5px;
+        cursor: pointer;
+        font-size: 18px;
+        border-radius: 10px;
+        background-color: gold;
+
+      }
+      .acceptModal {
+        border: 1px solid black;
+        margin: 2px;
+        padding: 5px;
+        cursor: pointer;
+        font-size: 18px;
+        border-radius: 10px;
+        background-color: gold;
+      }
+    }
     .close { /* The Close Button */
-      float: right;
       color: #aaaaaa;
-      font-size: 28px;
+      font-size: 50px;
       font-weight: bold;
       &:hover, &:focus {
         color: #000;
