@@ -7,36 +7,35 @@
     <title>To-do list</title>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <link href="https://fonts.googleapis.com/css?family=Liu+Jian+Mao+Cao|Roboto&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
-      rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   </head>
+  
   <body>
-    
+
     <form id="formTodo" class="header">
       <h1>My to-do list</h2>
-        <input type="text" id="newTodo" placeholder="Title...">
-        <button id="addTodo" class="addTodo">Add</button>
-      </form>
+        <input type="text" id="newTodo" class="newTodo" placeholder="Insert your to-do...">
+        <button id="addTodo" class="addTodo">ADD</button>
+    </form>
       
-      <ul id="list" class="list">
-      </ul>
+    <ul id="list" class="list"></ul>
       
-      <div id="myModal" class="modal">
-        
-        <!-- Modal content -->
-        <div class="modal-content">
-          <span id="closeModal" class="close">&times;</span>
-          <div>
-            <input type="text" id="popupInput" placeholder="Title...">
-            <button id="cancelModal">CANCEL</button>
-            <button id="acceptModal">OK</button>
-          </div>
+    <div id="myModal" class="modal">
+      <div class="modal-content">
+        <div>
+          <input type="text" id="popupInput" class="popupInput">
+          <button id="cancelModal" class="cancelModal">CANCEL</button>
+          <button id="acceptModal" class="acceptModal">OK</button>
         </div>
-        
-      </div>
-      <div id="loaderBox" class="loader-box">
-        <div class="lds-ripple"><div></div><div></div></div>
-      </div>
-      <script src="scripts/script.js"></script>
-    </body>
-    </html>
+        <span id="closeModal" class="close">&times;</span>
+      </div>    
+    </div>
+
+    <div id="loaderBox" class="loader-box">
+      <div class="lds-ripple"><div></div><div></div></div>
+    </div>
+
+    <script src="scripts/script.js"></script>
+
+  </body>
+</html>

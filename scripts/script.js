@@ -81,7 +81,7 @@ let getTodosFromServer = () => {
   .then(response => {
     response.data.forEach(todo => {
       addNewElementToList(todo.title, todo.id);
-      if (todo.extra === "done") {document.getElementById(todo.id).firstChild.className = "done"}; // Przekreślenie jeśli element był oznaczone jako "done"
+      if (todo.extra === "done") {document.getElementById(todo.id).className = "done"}; // Przekreślenie jeśli element był oznaczone jako "done"
     });
   })
   .catch(e => console.log(`Error ${e}`))
@@ -125,13 +125,13 @@ let createElement = (title, id) => {
   const newElementWhole = 
   `<li id="${id}"><span>${title}</span>
       <span class="buttons">
-        <button class="delBtns">
+        <button class="delBtns" title="delete">
           <i class="material-icons">delete_outline</i>
         </button>
-        <button class="editBtns">
+        <button class="editBtns" title="edit">
           <i class="material-icons">text_format</i>
         </button>
-        <button class="markAsDone">
+        <button class="markAsDone" title="done">
           <i class="material-icons">done</i>
         </button>
       </span>
@@ -160,7 +160,7 @@ let deleteTodo = () => {
 
 let markAsDone = () => {
   // Oznacza jako zrobiony albo usuwa oznaczenie jeśli było i przesyła info do serwera
-  const element = document.getElementById(currentId).firstChild;
+  const element = document.getElementById(currentId);
   if (element.className === "") {
     element.classList.add("done");
     showLoader();
